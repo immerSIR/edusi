@@ -3,7 +3,6 @@ from fastapi import APIRouter, Request, HTTPException
 from app.db.supabase import get_supabase
 from app.models.schemas import WhatsAppMessagePayload
 from app.services.whatsapp_service import (
-    verify_webhook_signature,
     process_incoming_message,
     send_whatsapp_message,
 )
@@ -28,12 +27,6 @@ async def verify_webhook(request: Request):
 @router.post("/webhook")
 async def receive_webhook(request: Request):
     """Receive incoming WhatsApp messages."""
-    body = await request.body()
-    signature = request.headers.get("x-hub-signature-256", "")
-
-    if not verify_webhook_signature(body, signature):
-        raise HTTPException(status_code=403, detail="Invalid signature")
-
     data = await request.json()
 
     # Extract message from WhatsApp Cloud API payload

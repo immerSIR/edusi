@@ -1,40 +1,23 @@
-import hashlib
-import hmac
-
 import httpx
 
 from app.core.config import settings
 from app.models.schemas import WhatsAppMessagePayload
 
 
-def verify_webhook_signature(body: bytes, signature: str) -> bool:
-    """Verify the X-Hub-Signature-256 header from WhatsApp."""
-    if not settings.whatsapp_app_secret:
-        return True  # Skip verification in dev
-
-    expected = hmac.new(
-        settings.whatsapp_app_secret.encode(),
-        body,
-        hashlib.sha256,
-    ).hexdigest()
-
-    return hmac.compare_digest(f"sha256={expected}", signature)
-
-
 async def send_whatsapp_message(to: str, text: str) -> dict:
-    """Send a text message via WhatsApp Cloud API."""
+    """Send a text message via WhatsApp Cloud API (v23.0)."""
     if not settings.whatsapp_access_token:
-        # Dev mode: just log
         print(f"[WhatsApp] To: {to} | Message: {text}")
         return {"status": "dev_mode"}
 
-    url = f"https://graph.facebook.com/v21.0/{settings.whatsapp_phone_number_id}/messages"
+    url = f"https://graph.facebook.com/v23.0/{settings.whatsapp_phone_number_id}/messages"
     headers = {
         "Authorization": f"Bearer {settings.whatsapp_access_token}",
         "Content-Type": "application/json",
     }
     payload = {
         "messaging_product": "whatsapp",
+        "recipient_type": "individual",
         "to": to,
         "type": "text",
         "text": {"body": text},
@@ -52,7 +35,7 @@ async def process_incoming_message(payload: WhatsAppMessagePayload) -> str:
 
         if text in ("hi", "hello", "bawo ni", "start"):
             return (
-                "Welcome to Edusi! 📚\n"
+                "Welcome to Edusi!\n"
                 "Kaabo si Edusi!\n\n"
                 "Send 'learn' to start a lesson\n"
                 "Send 'progress' to see your progress"
@@ -71,7 +54,7 @@ async def process_incoming_message(payload: WhatsAppMessagePayload) -> str:
             return (
                 "Your Progress / Ilowosi re:\n"
                 "Lessons completed: 3\n"
-                "Points: 150 ⭐\n"
+                "Points: 150\n"
                 "Level: 2"
             )
         else:

@@ -4,30 +4,6 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const BACKEND_URL = Deno.env.get("BACKEND_URL") || "http://localhost:8000";
 const WHATSAPP_VERIFY_TOKEN = Deno.env.get("WHATSAPP_VERIFY_TOKEN") || "";
 const WHATSAPP_ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN") || "";
-const WHATSAPP_APP_SECRET = Deno.env.get("WHATSAPP_APP_SECRET") || "";
-
-async function verifySignature(
-  body: string,
-  signature: string
-): Promise<boolean> {
-  if (!WHATSAPP_APP_SECRET) return true; // Skip in dev
-
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(WHATSAPP_APP_SECRET),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-
-  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
-  const hex = Array.from(new Uint8Array(sig))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-
-  return `sha256=${hex}` === signature;
-}
 
 Deno.serve(async (req: Request) => {
   // GET: Webhook verification challenge
@@ -45,14 +21,7 @@ Deno.serve(async (req: Request) => {
 
   // POST: Incoming message
   if (req.method === "POST") {
-    const body = await req.text();
-    const signature = req.headers.get("x-hub-signature-256") || "";
-
-    if (!(await verifySignature(body, signature))) {
-      return new Response("Invalid signature", { status: 403 });
-    }
-
-    const data = JSON.parse(body);
+    const data = await req.json();
 
     try {
       const entry = data.entry?.[0];
@@ -60,7 +29,6 @@ Deno.serve(async (req: Request) => {
       const value = changes?.value;
       const messages = value?.messages || [];
 
-      // Initialize Supabase client with service role
       const supabase = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -127,7 +95,7 @@ async function sendMessage(to: string, text: string) {
 
   const phoneNumberId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
   await fetch(
-    `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`,
+    `https://graph.facebook.com/v23.0/${phoneNumberId}/messages`,
     {
       method: "POST",
       headers: {
@@ -136,6 +104,7 @@ async function sendMessage(to: string, text: string) {
       },
       body: JSON.stringify({
         messaging_product: "whatsapp",
+        recipient_type: "individual",
         to,
         type: "text",
         text: { body: text },

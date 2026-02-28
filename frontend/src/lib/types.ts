@@ -19,12 +19,20 @@ export interface Child {
   id: string;
   parent_id: string;
   name: string;
-  age: number;
+  date_of_birth: string;
   avatar_url: string | null;
   current_level: number;
   total_points: number;
   preferred_language: string;
+  school_grade: string | null;
+  english_proficiency: string | null;
+  tech_familiarity: string | null;
   created_at: string;
+}
+
+/** Child enriched with computed age (from date_of_birth). */
+export interface ChildWithAge extends Child {
+  age: number;
 }
 
 export interface Course {
@@ -35,6 +43,8 @@ export interface Course {
   difficulty_level: number;
   thumbnail_url: string;
   is_premium: boolean;
+  min_age: number;
+  max_age: number;
   created_at: string;
 }
 

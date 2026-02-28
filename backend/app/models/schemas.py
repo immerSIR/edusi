@@ -9,8 +9,11 @@ class BilingualText(BaseModel):
 
 class ChildCreate(BaseModel):
     name: str
-    age: int
+    date_of_birth: str
     preferred_language: str = "yo"
+    school_grade: Optional[str] = None
+    english_proficiency: Optional[str] = "basic"
+    tech_familiarity: Optional[str] = "none"
 
 
 class WhatsAppLinkRequest(BaseModel):
@@ -43,6 +46,8 @@ class ContentGenerateRequest(BaseModel):
     topic: str
     difficulty_level: int = 1
     target_language: str = "en"
+    min_age: int = 3
+    max_age: int = 16
 
 
 class CourseResponse(BaseModel):
@@ -79,6 +84,34 @@ class ChildStatsResponse(BaseModel):
     lessons_completed: int
     accuracy: float
     streak_days: int
+
+
+class IllustrationGenerateRequest(BaseModel):
+    description: str
+    style: str = "colorful children's book illustration"
+
+
+class StepIllustrationRequest(BaseModel):
+    lesson_id: str
+    step_index: int
+    description: str
+
+
+class IllustrationResponse(BaseModel):
+    image_base64: str
+    mime_type: str
+    prompt_used: str
+
+
+class CourseThumbnailRequest(BaseModel):
+    course_id: str
+    description: str
+
+
+class CourseGenerateRequest(BaseModel):
+    subject: str = "technology"
+    child_age: int = 8
+    covered_topics: list[str] = []
 
 
 class WhatsAppMessagePayload(BaseModel):
