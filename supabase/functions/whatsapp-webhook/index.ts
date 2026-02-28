@@ -46,34 +46,45 @@ Deno.serve(async (req: Request) => {
           .single();
 
         if (!profile) {
-          await sendMessage(
-            fromNumber,
-            "This number is not registered. Sign up at edusi.app first.\nNomba yi ko ti forukosile. Forukosile ni edusi.app."
-          );
+          // Only message the edge function sends directly
+          await sendRejectMessage(fromNumber);
           continue;
         }
 
-        // Forward to backend for processing
-        const response = await fetch(
-          `${BACKEND_URL}/api/whatsapp/process-message`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              from_number: fromNumber,
-              message_type: msg.type,
-              text: msg.text?.body || null,
-              audio_url: msg.audio?.id || null,
-            }),
-          }
-        );
+        // Build expanded payload for backend
+        const forwardPayload: Record<string, string | null> = {
+          from_number: fromNumber,
+          profile_id: profile.id,
+          message_type: msg.type,
+          text: null,
+          audio_media_id: null,
+          interactive_type: null,
+          interactive_reply_id: null,
+          interactive_reply_title: null,
+        };
 
-        if (response.ok) {
-          const result = await response.json();
-          if (result.reply) {
-            await sendMessage(fromNumber, result.reply);
+        if (msg.type === "text") {
+          forwardPayload.text = msg.text?.body || null;
+        } else if (msg.type === "audio") {
+          forwardPayload.audio_media_id = msg.audio?.id || null;
+        } else if (msg.type === "interactive") {
+          const interactive = msg.interactive;
+          forwardPayload.interactive_type = interactive?.type || null;
+          if (interactive?.type === "button_reply") {
+            forwardPayload.interactive_reply_id = interactive.button_reply?.id || null;
+            forwardPayload.interactive_reply_title = interactive.button_reply?.title || null;
+          } else if (interactive?.type === "list_reply") {
+            forwardPayload.interactive_reply_id = interactive.list_reply?.id || null;
+            forwardPayload.interactive_reply_title = interactive.list_reply?.title || null;
           }
         }
+
+        // Fire-and-forget: backend processes async and sends replies directly
+        fetch(`${BACKEND_URL}/api/whatsapp/process-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(forwardPayload),
+        }).catch((err) => console.error("Backend forward error:", err));
       }
     } catch (error) {
       console.error("Webhook processing error:", error);
@@ -87,9 +98,9 @@ Deno.serve(async (req: Request) => {
   return new Response("Method not allowed", { status: 405 });
 });
 
-async function sendMessage(to: string, text: string) {
+async function sendRejectMessage(to: string) {
   if (!WHATSAPP_ACCESS_TOKEN) {
-    console.log(`[WhatsApp DEV] To: ${to} | ${text}`);
+    console.log(`[WhatsApp DEV] Reject: ${to}`);
     return;
   }
 
@@ -104,10 +115,11 @@ async function sendMessage(to: string, text: string) {
       },
       body: JSON.stringify({
         messaging_product: "whatsapp",
-        recipient_type: "individual",
         to,
         type: "text",
-        text: { body: text },
+        text: {
+          body: "This number is not registered. Sign up at edusi.app first.\nNomba yi ko ti forukosile. Forukosile ni edusi.app.",
+        },
       }),
     }
   );

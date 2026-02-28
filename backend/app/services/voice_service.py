@@ -274,7 +274,7 @@ async def transcribe_audio(audio_bytes: bytes, language: str) -> dict:
     # English: use GPT-4o-mini-transcribe with logprobs for confidence scoring
     client = _get_openai()
     audio_file = io.BytesIO(audio_bytes)
-    audio_file.name = "audio.webm"
+    audio_file.name = "audio.ogg"
 
     transcript = await client.audio.transcriptions.create(
         model="gpt-4o-mini-transcribe",

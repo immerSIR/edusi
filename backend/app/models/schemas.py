@@ -116,6 +116,10 @@ class CourseGenerateRequest(BaseModel):
 
 class WhatsAppMessagePayload(BaseModel):
     from_number: str
-    message_type: str
+    profile_id: str
+    message_type: str  # "text" | "audio" | "interactive"
     text: Optional[str] = None
-    audio_url: Optional[str] = None
+    audio_media_id: Optional[str] = None
+    interactive_type: Optional[str] = None  # "button_reply" | "list_reply"
+    interactive_reply_id: Optional[str] = None
+    interactive_reply_title: Optional[str] = None
