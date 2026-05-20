@@ -44,7 +44,8 @@ async def test_verify_webhook_rejects_invalid_token(monkeypatch):
     assert exc.value.status_code == 403
 
 
-async def test_process_message_enqueues_background_handler():
+async def test_process_message_enqueues_background_handler(monkeypatch):
+    monkeypatch.setattr(settings, "backend_internal_secret", "expected-secret")
     tasks = BackgroundTasks()
     payload = WhatsAppMessagePayload(
         from_number="+2348012345678",
@@ -53,6 +54,10 @@ async def test_process_message_enqueues_background_handler():
         text="hello",
     )
 
-    assert await whatsapp.process_message(payload, tasks) == {"status": "accepted"}
+    assert await whatsapp.process_message(
+        payload,
+        tasks,
+        x_backend_secret="expected-secret",
+    ) == {"status": "accepted"}
     assert len(tasks.tasks) == 1
     assert tasks.tasks[0].args == (payload,)

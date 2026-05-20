@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { getBackendAuthHeaders } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -81,6 +82,7 @@ export function useVoiceRecorder(
 
           const res = await fetch(`${API_URL}/api/voice/transcribe?language=${language}`, {
             method: "POST",
+            headers: await getBackendAuthHeaders(),
             body: formData,
           });
 

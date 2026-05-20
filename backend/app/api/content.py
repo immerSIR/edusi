@@ -1,7 +1,7 @@
 import base64
 import logging
 
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends
 
 from app.models.schemas import (
     ContentGenerateRequest,
@@ -13,6 +13,7 @@ from app.models.schemas import (
 from app.services.ai_service import generate_course_with_lessons, generate_lesson_content
 from app.services.illustration_service import generate_illustration
 from app.db.supabase import get_supabase
+from app.core.security import require_current_user_id, require_direct_user_id
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,12 @@ _generating_courses: set[str] = set()
 
 
 @router.post("/generate-lesson")
-async def generate_lesson(req: ContentGenerateRequest):
+async def generate_lesson(
+    req: ContentGenerateRequest,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Generate lesson content using Gemini. Admin endpoint."""
+    require_direct_user_id(current_user_id)
     result = await generate_lesson_content(
         subject=req.subject,
         topic=req.topic,
@@ -37,8 +42,12 @@ async def generate_lesson(req: ContentGenerateRequest):
 
 
 @router.post("/generate-course")
-async def generate_course(req: CourseGenerateRequest):
+async def generate_course(
+    req: CourseGenerateRequest,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Generate an entire course with lessons based on child's age and progress."""
+    require_direct_user_id(current_user_id)
     sb = get_supabase()
 
     result = await generate_course_with_lessons(
@@ -89,12 +98,17 @@ async def generate_course(req: CourseGenerateRequest):
 
 
 @router.post("/courses/{course_id}/auto-generate")
-async def auto_generate_lessons(course_id: str, background_tasks: BackgroundTasks):
+async def auto_generate_lessons(
+    course_id: str,
+    background_tasks: BackgroundTasks,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Idempotent endpoint: generates lessons for a course if none exist.
 
     Safe to call multiple times — deduplicates via in-memory lock and DB check.
     Generation runs as a background task so the response returns immediately.
     """
+    require_direct_user_id(current_user_id)
     sb = get_supabase()
 
     # Check if lessons already exist
@@ -149,8 +163,12 @@ async def _run_lesson_generation(course_id: str, course_data: dict):
 
 
 @router.post("/generate-illustration")
-async def generate_illustration_endpoint(req: IllustrationGenerateRequest):
+async def generate_illustration_endpoint(
+    req: IllustrationGenerateRequest,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Generate a culturally relevant illustration using Gemini Imagen. Admin endpoint."""
+    require_direct_user_id(current_user_id)
     result = await generate_illustration(
         description=req.description,
         style=req.style,
@@ -159,12 +177,16 @@ async def generate_illustration_endpoint(req: IllustrationGenerateRequest):
 
 
 @router.post("/step-illustration")
-async def step_illustration(req: StepIllustrationRequest):
+async def step_illustration(
+    req: StepIllustrationRequest,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Generate and cache an illustration for a lesson step.
 
     Checks Supabase Storage first — returns cached URL if exists.
     Otherwise generates via Gemini Imagen, uploads to Storage, returns public URL.
     """
+    require_direct_user_id(current_user_id)
     sb = get_supabase()
     bucket = "illustrations"
     path = f"{req.lesson_id}_{req.step_index}.png"
@@ -200,12 +222,16 @@ async def step_illustration(req: StepIllustrationRequest):
 
 
 @router.post("/course-thumbnail")
-async def course_thumbnail(req: CourseThumbnailRequest):
+async def course_thumbnail(
+    req: CourseThumbnailRequest,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Generate and cache a thumbnail illustration for a course card.
 
     Checks Supabase Storage first — returns cached URL if exists.
     Otherwise generates via Gemini Imagen, uploads to Storage, returns public URL.
     """
+    require_direct_user_id(current_user_id)
     sb = get_supabase()
     bucket = "illustrations"
     path = f"course_{req.course_id}.png"

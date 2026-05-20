@@ -12,6 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { Course } from "@/lib/types";
+import { getBackendAuthHeaders } from "@/lib/api";
 import { motion } from "framer-motion";
 import { CourseThumbnail } from "@/components/CourseThumbnail";
 import { useChild } from "@/contexts/ChildContext";
@@ -155,7 +156,10 @@ export default function LearnPage() {
 
       const res = await fetch(`${BACKEND_URL}/api/content/generate-course`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getBackendAuthHeaders()),
+        },
         body: JSON.stringify({
           subject,
           child_age: child.age,

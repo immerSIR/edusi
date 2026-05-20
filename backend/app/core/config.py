@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # Server
     cors_origins: str = "http://localhost:3000"
     backend_url: str = "http://localhost:8000"
+    backend_internal_secret: str = ""
+    max_audio_upload_bytes: int = 5 * 1024 * 1024
+    max_tts_text_chars: int = 2000
 
     model_config = {"env_file": ("../.env", ".env"), "extra": "ignore"}
 

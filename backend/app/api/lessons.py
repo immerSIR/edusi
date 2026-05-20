@@ -1,9 +1,23 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.db.supabase import get_supabase
 from app.models.schemas import LessonProgressUpdate
+from app.core.security import require_current_user_id, require_direct_user_id
 
 router = APIRouter(prefix="/lessons", tags=["lessons"])
+
+
+def _ensure_child_owned(db, child_id: str, current_user_id: str) -> None:
+    child = (
+        db.table("children")
+        .select("id")
+        .eq("id", child_id)
+        .eq("parent_id", current_user_id)
+        .single()
+        .execute()
+    )
+    if not child.data:
+        raise HTTPException(status_code=404, detail="Child not found")
 
 
 @router.get("/courses")
@@ -44,9 +58,15 @@ async def get_lesson(lesson_id: str):
 
 
 @router.post("/{lesson_id}/progress")
-async def update_progress(lesson_id: str, req: LessonProgressUpdate):
+async def update_progress(
+    lesson_id: str,
+    req: LessonProgressUpdate,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Update lesson progress for a child."""
+    current_user_id = require_direct_user_id(current_user_id)
     db = get_supabase()
+    _ensure_child_owned(db, req.child_id, current_user_id)
 
     # Get existing progress or create new
     existing = (
@@ -87,9 +107,14 @@ async def update_progress(lesson_id: str, req: LessonProgressUpdate):
 
 
 @router.get("/next")
-async def get_next_lesson(child_id: str):
+async def get_next_lesson(
+    child_id: str,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Get the recommended next lesson for a child based on adaptive difficulty."""
+    current_user_id = require_direct_user_id(current_user_id)
     db = get_supabase()
+    _ensure_child_owned(db, child_id, current_user_id)
 
     # Get child's completed lessons
     completed = (
@@ -123,9 +148,14 @@ async def get_next_lesson(child_id: str):
 
 
 @router.get("/children/{child_id}/stats")
-async def get_child_stats(child_id: str):
+async def get_child_stats(
+    child_id: str,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Get gamification stats for a child."""
+    current_user_id = require_direct_user_id(current_user_id)
     db = get_supabase()
+    _ensure_child_owned(db, child_id, current_user_id)
 
     child = (
         db.table("children").select("*").eq("id", child_id).single().execute()
@@ -155,9 +185,14 @@ async def get_child_stats(child_id: str):
 
 
 @router.get("/children/{child_id}/achievements")
-async def get_child_achievements(child_id: str):
+async def get_child_achievements(
+    child_id: str,
+    current_user_id: str = Depends(require_current_user_id),
+):
     """Get earned achievements for a child."""
+    current_user_id = require_direct_user_id(current_user_id)
     db = get_supabase()
+    _ensure_child_owned(db, child_id, current_user_id)
     result = (
         db.table("child_achievements")
         .select("*, achievements(*)")

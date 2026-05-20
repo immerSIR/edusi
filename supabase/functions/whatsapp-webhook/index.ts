@@ -2,6 +2,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const BACKEND_URL = Deno.env.get("BACKEND_URL") || "http://localhost:8000";
+const BACKEND_INTERNAL_SECRET = Deno.env.get("BACKEND_INTERNAL_SECRET") || "";
+const WHATSAPP_APP_SECRET = Deno.env.get("WHATSAPP_APP_SECRET") || "";
 const WHATSAPP_VERIFY_TOKEN = Deno.env.get("WHATSAPP_VERIFY_TOKEN") || "";
 const WHATSAPP_ACCESS_TOKEN = Deno.env.get("WHATSAPP_ACCESS_TOKEN") || "";
 
@@ -21,7 +23,23 @@ Deno.serve(async (req: Request) => {
 
   // POST: Incoming message
   if (req.method === "POST") {
-    const data = await req.json();
+    if (!BACKEND_INTERNAL_SECRET) {
+      console.error("BACKEND_INTERNAL_SECRET is not configured");
+      return new Response("Service unavailable", { status: 503 });
+    }
+
+    const bodyText = await req.text();
+    const signature = req.headers.get("x-hub-signature-256");
+    if (!(await verifyMetaSignature(signature, bodyText))) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    let data: Record<string, any>;
+    try {
+      data = JSON.parse(bodyText);
+    } catch {
+      return new Response("Invalid JSON", { status: 400 });
+    }
 
     try {
       const entry = data.entry?.[0];
@@ -82,7 +100,10 @@ Deno.serve(async (req: Request) => {
         // Fire-and-forget: backend processes async and sends replies directly
         fetch(`${BACKEND_URL}/api/whatsapp/process-message`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-Backend-Secret": BACKEND_INTERNAL_SECRET,
+          },
           body: JSON.stringify(forwardPayload),
         }).catch((err) => console.error("Backend forward error:", err));
       }
@@ -97,6 +118,49 @@ Deno.serve(async (req: Request) => {
 
   return new Response("Method not allowed", { status: 405 });
 });
+
+async function verifyMetaSignature(
+  signatureHeader: string | null,
+  bodyText: string
+): Promise<boolean> {
+  if (!WHATSAPP_APP_SECRET) {
+    console.error("WHATSAPP_APP_SECRET is not configured");
+    return false;
+  }
+  if (!signatureHeader?.startsWith("sha256=")) return false;
+
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(WHATSAPP_APP_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const digest = await crypto.subtle.sign("HMAC", key, encoder.encode(bodyText));
+  const expected = `sha256=${toHex(digest)}`;
+
+  return timingSafeEqual(signatureHeader.toLowerCase(), expected);
+}
+
+function toHex(buffer: ArrayBuffer): string {
+  return [...new Uint8Array(buffer)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function timingSafeEqual(left: string, right: string): boolean {
+  const encoder = new TextEncoder();
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
+  if (leftBytes.length !== rightBytes.length) return false;
+
+  let difference = 0;
+  for (let index = 0; index < leftBytes.length; index++) {
+    difference |= leftBytes[index] ^ rightBytes[index];
+  }
+  return difference === 0;
+}
 
 async function sendRejectMessage(to: string) {
   if (!WHATSAPP_ACCESS_TOKEN) {
