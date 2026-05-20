@@ -17,6 +17,9 @@ out/
 dist/
 build/
 *.egg-info/
+coverage/
+.coverage
+coverage.xml
 
 # IDE
 .vscode/
