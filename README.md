@@ -10,6 +10,10 @@
 
 Edusi is a gamified bilingual learning platform for Nigerian children. It teaches English and technology through Yoruba/English lessons, voice interactions, illustrations, progress tracking, and WhatsApp learning flows.
 
+## Developer Docs
+
+Developer documentation is available in [docs/](docs/) and is published as a GitHub Pages site from the `main` branch.
+
 ## Stack
 
 - `frontend/` - Next.js App Router, TypeScript, Tailwind CSS, PWA assets
@@ -30,7 +34,7 @@ Edusi is a gamified bilingual learning platform for Nigerian children. It teache
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-org/edusi.git
+   git clone https://github.com/immerSIR/edusi.git
    cd edusi
    ```
 
