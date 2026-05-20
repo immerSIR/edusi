@@ -1,5 +1,13 @@
 # Edusi
 
+[![CI](https://github.com/immerSIR/edusi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/immerSIR/edusi/actions/workflows/ci.yml)
+[![Test and coverage](https://github.com/immerSIR/edusi/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/immerSIR/edusi/actions/workflows/test.yml)
+[![Codecov](https://codecov.io/gh/immerSIR/edusi/graph/badge.svg)](https://codecov.io/gh/immerSIR/edusi)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](frontend)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)](backend)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Auth%20%7C%20Storage-3FCF8E?logo=supabase&logoColor=white)](supabase)
+
 Edusi is a gamified bilingual learning platform for Nigerian children. It teaches English and technology through Yoruba/English lessons, voice interactions, illustrations, progress tracking, and WhatsApp learning flows.
 
 ## Stack
