@@ -31,6 +31,15 @@ describe("apiFetch", () => {
     });
   });
 
+  it("returns no authorization header when there is no Supabase session", async () => {
+    supabaseMocks.getSession.mockResolvedValue({
+      data: { session: null },
+      error: null,
+    });
+
+    await expect(getBackendAuthHeaders()).resolves.toEqual({});
+  });
+
   it("adds the Supabase bearer token for authenticated backend requests", async () => {
     supabaseMocks.getSession.mockResolvedValue({
       data: { session: { access_token: "session-token" } },
