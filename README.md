@@ -7,12 +7,13 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](frontend)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)](backend)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Auth%20%7C%20Storage-3FCF8E?logo=supabase&logoColor=white)](supabase)
+[![Developer Docs](https://img.shields.io/badge/Developer%20Docs-GitHub%20Pages-08875D)](https://immersir.github.io/edusi/)
 
 Edusi is a gamified bilingual learning platform for Nigerian children. It teaches English and technology through Yoruba/English lessons, voice interactions, illustrations, progress tracking, and WhatsApp learning flows.
 
 ## Developer Docs
 
-Developer documentation is available in [docs/](docs/) and is published as a GitHub Pages site from the `main` branch.
+Start with the [published developer documentation](https://immersir.github.io/edusi/) for setup, architecture, Supabase, API, and deployment guidance. The source for the docs site lives in [docs/](docs/).
 
 ## Stack
 
