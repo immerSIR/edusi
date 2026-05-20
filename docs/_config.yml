@@ -1,0 +1,10 @@
+title: Edusi Developer Docs
+description: Developer documentation for the Edusi learning platform.
+theme: minima
+markdown: kramdown
+
+header_pages:
+  - index.md
+
+plugins:
+  - jekyll-seo-tag
