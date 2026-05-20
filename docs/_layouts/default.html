@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% seo %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="{{ '/' | relative_url }}" aria-label="Edusi Developer Docs home">
+        <span class="brand-mark">E</span>
+        <span>Edusi Developer Docs</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#setup">Setup</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#supabase">Supabase</a>
+        <a href="#api">API</a>
+        <a href="#deploy">Deploy</a>
+      </nav>
+    </header>
+    <main>
+      {{ content }}
+    </main>
+    <footer class="site-footer">
+      <span>Edusi</span>
+      <span>Developer documentation for the bilingual learning platform.</span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+title: Edusi Developer Docs
+description: Developer documentation for the Edusi learning platform.
+markdown: kramdown
+permalink: pretty
+
+plugins:
+  - jekyll-seo-tag

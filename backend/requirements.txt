@@ -1,0 +1,14 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.47.0
+supabase>=2.10.0
+httpx>=0.28.1
+python-multipart>=0.0.29
+pydantic-settings>=2.6.0
+python-jose[cryptography]>=3.3.0
+google-genai>=1.0.0
+openai>=2.37.0
+transformers>=4.46.0
+# torch installed separately in Dockerfile (CPU-only)
+scipy>=1.17.1
+soundfile>=0.12.0
+accelerate>=1.1.0

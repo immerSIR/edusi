@@ -1,0 +1,26 @@
+coverage:
+  precision: 2
+  round: down
+  range: "80...100"
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: false
+
+flags:
+  frontend:
+    paths:
+      - frontend/src/lib/
+  backend:
+    paths:
+      - backend/app/
