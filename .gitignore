@@ -9,6 +9,7 @@ venv/
 .env
 .env.local
 .env.*.local
+.envrc
 
 # Build
 .next/
@@ -32,6 +33,8 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+2026-*-this-session-is-being-continued-from-a-previous-*.txt
 
 # PWA
 sw.js
