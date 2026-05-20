@@ -1,227 +1,335 @@
-# Edusi Developer Documentation
+---
+layout: default
+title: Edusi Developer Docs
+description: Developer documentation for the Edusi learning platform.
+---
 
-Edusi is a gamified bilingual learning platform for Nigerian children. The product combines a Next.js frontend, a FastAPI backend, Supabase data services, AI-powered voice and illustration flows, and WhatsApp learning interactions.
+<div class="page-shell">
+  <div class="docs-grid">
+    <aside class="side-panel" aria-label="Developer documentation sections">
+      <nav class="side-nav">
+        <p>Get started</p>
+        <a href="#overview">Overview</a>
+        <a href="#setup">Quick start</a>
+        <a href="#architecture">Architecture</a>
+        <p>Build</p>
+        <a href="#repository">Repository map</a>
+        <a href="#supabase">Supabase</a>
+        <a href="#api">Environment</a>
+        <a href="#deploy">Deploy</a>
+      </nav>
+      <div class="side-note">
+        <strong>Developer rule</strong>
+        <span>Keep public browser configuration separate from backend secrets and provider credentials.</span>
+      </div>
+    </aside>
 
-This page is the developer entry point for understanding, running, changing, and deploying the project.
+    <div class="docs-content">
+      <section class="intro" id="overview">
+        <h1>Edusi Developer Docs</h1>
+        <p>Build, run, and ship Edusi across Next.js, FastAPI, Supabase, AI services, and WhatsApp learning flows.</p>
+        <div class="intro-actions">
+          <a class="button primary" href="#setup">Start setup</a>
+          <a class="button secondary" href="https://github.com/immerSIR/edusi">GitHub repository</a>
+        </div>
+      </section>
 
-## Repository Map
+      <section class="section compact" id="setup">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Setup</span>
+            <h2>Get the full stack<br>running locally.</h2>
+          </div>
+          <p class="section-intro">Use Node 22+, npm 10+, Python 3.12+, and the Supabase CLI. Docker is optional for local service orchestration.</p>
+        </div>
 
-| Path | Purpose |
-| --- | --- |
-| `frontend/` | Next.js App Router app, TypeScript, Tailwind CSS, PWA assets, browser Supabase client, and UI workflows. |
-| `backend/` | FastAPI API server, service integrations, request/response schemas, and backend tests. |
-| `supabase/migrations/` | Database schema, row-level security policies, seed data, curriculum data, and storage setup. |
-| `supabase/functions/` | Supabase Edge Functions, currently including the WhatsApp webhook entry point. |
-| `.github/workflows/` | Continuous integration, test coverage, and GitHub Pages publishing workflows. |
-| `docker-compose.yml` | Local container orchestration for the frontend and backend. |
-
-## Runtime Architecture
-
-The frontend talks to the FastAPI backend through `NEXT_PUBLIC_API_URL` or `NEXT_PUBLIC_BACKEND_URL`. Browser-visible Supabase access uses public Supabase environment variables, while privileged database access stays on the backend through `SUPABASE_SERVICE_ROLE_KEY`.
-
-The backend groups route handlers under `backend/app/api/` and shared logic under `backend/app/services/`:
-
-| Area | Main files |
-| --- | --- |
-| Authentication | `backend/app/api/auth.py`, `frontend/src/app/auth/` |
-| Lessons and curriculum | `backend/app/api/lessons.py`, `backend/app/services/ai_service.py`, `supabase/migrations/` |
-| Voice interactions | `backend/app/api/voice.py`, `backend/app/services/voice_service.py` |
-| Translation | `backend/app/services/translate_service.py` |
-| Illustrations | `backend/app/services/illustration_service.py`, Supabase storage migrations |
-| WhatsApp | `backend/app/api/whatsapp.py`, `backend/app/services/whatsapp_service.py`, `supabase/functions/whatsapp-webhook/` |
-
-## Prerequisites
-
-- Node.js 22 or newer
-- npm 10 or newer
-- Python 3.12 or newer
-- Docker, optional but recommended
-- Supabase CLI, for local database and Edge Function development
-
-## Local Setup
-
-Clone the repository and create your local environment file:
-
-```bash
-git clone https://github.com/immerSIR/edusi.git
+        <div class="grid three">
+          <article class="code-card">
+            <header>
+              <h3>Clone and configure</h3>
+              <span>root</span>
+            </header>
+            <pre class="terminal"><code>gh repo clone immerSIR/edusi
 cd edusi
-cp .env.example .env
-```
+cp .env.example .env</code></pre>
+          </article>
 
-Install frontend dependencies:
-
-```bash
-cd frontend
+          <article class="code-card">
+            <header>
+              <h3>Frontend</h3>
+              <span>localhost:3000</span>
+            </header>
+            <pre class="terminal"><code>cd frontend
 npm install
-cd ..
-```
+npm run dev</code></pre>
+          </article>
 
-Install backend dependencies:
-
-```bash
-cd backend
+          <article class="code-card">
+            <header>
+              <h3>Backend</h3>
+              <span>localhost:8000</span>
+            </header>
+            <pre class="terminal"><code>cd backend
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cd ..
-```
+uvicorn app.main:app --reload</code></pre>
+          </article>
+        </div>
+      </section>
 
-Start the backend and frontend in separate terminals:
+      <section class="section" id="architecture">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Architecture</span>
+            <h2>Four lanes make up the product.</h2>
+          </div>
+          <p class="section-intro">Keep browser-safe access in the frontend and provider secrets on the backend. Shared contracts should move together across API schemas, frontend types, and migrations.</p>
+        </div>
 
-```bash
-cd backend
-uvicorn app.main:app --reload
-```
+        <div class="architecture">
+          <article class="lane">
+            <div>
+              <div class="lane-index">01</div>
+              <h3>Frontend</h3>
+              <p>Next.js screens, hooks, shared API helpers, child-friendly UI, and PWA assets.</p>
+            </div>
+            <ul>
+              <li><code>frontend/src/app/</code> contains routes and pages.</li>
+              <li><code>frontend/src/components/</code> contains reusable UI.</li>
+              <li><code>frontend/src/lib/api.ts</code> centralizes backend calls.</li>
+            </ul>
+            <p>Public values use <code>NEXT_PUBLIC_*</code> and are visible in the browser.</p>
+          </article>
 
-```bash
-cd frontend
-npm run dev
-```
+          <article class="lane">
+            <div>
+              <div class="lane-index">02</div>
+              <h3>Backend</h3>
+              <p>FastAPI route handlers, Pydantic schemas, and provider integrations.</p>
+            </div>
+            <ul>
+              <li><code>backend/app/api/</code> keeps route handlers.</li>
+              <li><code>backend/app/services/</code> owns provider logic.</li>
+              <li><code>backend/app/core/config.py</code> loads local settings.</li>
+            </ul>
+            <p>Service-role keys, AI keys, and WhatsApp tokens stay server-side.</p>
+          </article>
 
-The frontend runs at `http://localhost:3000` and the backend runs at `http://localhost:8000`.
+          <article class="lane">
+            <div>
+              <div class="lane-index">03</div>
+              <h3>Supabase</h3>
+              <p>Postgres schema, RLS, seed data, child profiles, storage, and curriculum content.</p>
+            </div>
+            <ul>
+              <li>Add SQL files under <code>supabase/migrations/</code>.</li>
+              <li>Run <code>supabase db reset</code> after schema changes.</li>
+              <li>Update frontend types and backend schemas together.</li>
+            </ul>
+            <p>Do not edit migrations that have already shipped.</p>
+          </article>
 
-## Environment Variables
+          <article class="lane">
+            <div>
+              <div class="lane-index">04</div>
+              <h3>WhatsApp</h3>
+              <p>Learning flows span the FastAPI API and the Supabase Edge Function webhook.</p>
+            </div>
+            <ul>
+              <li><code>backend/app/api/whatsapp.py</code></li>
+              <li><code>backend/app/services/whatsapp_service.py</code></li>
+              <li><code>supabase/functions/whatsapp-webhook/</code></li>
+            </ul>
+            <p>Use a tunnel for local Meta webhook callbacks.</p>
+          </article>
+        </div>
+      </section>
 
-Use `.env.example` as the source of truth for local variable names. Required local development values include:
+      <section class="section" id="repository">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Repository map</span>
+            <h2>Where to make changes.</h2>
+          </div>
+          <p class="section-intro">Start in the narrowest owning folder, then update adjacent contracts only when behavior crosses boundaries.</p>
+        </div>
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your-local-supabase-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-local-supabase-service-role-key
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
-BACKEND_URL=http://localhost:8000
-CORS_ORIGINS=http://localhost:3000
-```
+        <table class="repo-map">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>frontend/</code></td>
+              <td>Next.js App Router app, TypeScript, Tailwind CSS, PWA assets, Supabase browser client, and UI workflows.</td>
+            </tr>
+            <tr>
+              <td><code>backend/</code></td>
+              <td>FastAPI server, service integrations, request and response schemas, and backend tests.</td>
+            </tr>
+            <tr>
+              <td><code>supabase/migrations/</code></td>
+              <td>Database schema, row-level security policies, seed data, curriculum records, and storage setup.</td>
+            </tr>
+            <tr>
+              <td><code>supabase/functions/</code></td>
+              <td>Edge Functions, including the WhatsApp webhook entry point.</td>
+            </tr>
+            <tr>
+              <td><code>.github/workflows/</code></td>
+              <td>CI, coverage, and GitHub Pages publishing workflows.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-Provider keys are only needed when developing the matching integration:
+      <section class="section" id="supabase">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Supabase</span>
+            <h2>Reset locally before schema PRs.</h2>
+          </div>
+          <p class="section-intro">Supabase owns data shape and access control, so schema and policy changes need a full local reset before review.</p>
+        </div>
 
-| Variable | Used by |
-| --- | --- |
-| `OPENAI_API_KEY` | English ASR/TTS and OpenAI-backed services. |
-| `GOOGLE_TRANSLATE_API_KEY` | Translation service. |
-| `GOOGLE_GEMINI_API_KEY` | Gemini-backed generation flows. |
-| `WHATSAPP_ACCESS_TOKEN` | WhatsApp Cloud API calls. |
-| `WHATSAPP_PHONE_NUMBER_ID` | WhatsApp sender configuration. |
-| `WHATSAPP_VERIFY_TOKEN` | WhatsApp webhook verification. |
-| `WHATSAPP_APP_SECRET` | Meta webhook signature verification. |
-| `BACKEND_INTERNAL_SECRET` | Shared internal request protection where required. |
+        <div class="grid two">
+          <article class="code-card">
+            <header>
+              <h3>Local database</h3>
+              <span>supabase</span>
+            </header>
+            <pre class="terminal"><code>supabase start
+supabase db reset</code></pre>
+          </article>
 
-Never commit `.env`, service-role keys, API keys, WhatsApp tokens, generated transcripts, dependency folders, or build output.
+          <article class="code-card">
+            <header>
+              <h3>WhatsApp webhook</h3>
+              <span>edge function</span>
+            </header>
+            <pre class="terminal"><code>supabase functions serve whatsapp-webhook --env-file .env</code></pre>
+          </article>
+        </div>
+      </section>
 
-## Supabase Development
+      <section class="section" id="api">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Environment</span>
+            <h2>Know which values are public.</h2>
+          </div>
+          <p class="section-intro">Use <code>.env.example</code> as the source of truth. Browser variables are public; provider credentials and service-role access are backend-only.</p>
+        </div>
 
-Start Supabase locally and apply migrations:
+        <table class="env-table">
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Scope</th>
+              <th>Used by</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>NEXT_PUBLIC_SUPABASE_URL</code></td>
+              <td>Public</td>
+              <td>Frontend and backend Supabase URL configuration.</td>
+            </tr>
+            <tr>
+              <td><code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY</code></td>
+              <td>Public</td>
+              <td>Browser Supabase access.</td>
+            </tr>
+            <tr>
+              <td><code>NEXT_PUBLIC_API_URL</code>, <code>NEXT_PUBLIC_BACKEND_URL</code></td>
+              <td>Public</td>
+              <td>Frontend API calls to FastAPI.</td>
+            </tr>
+            <tr>
+              <td><code>SUPABASE_SERVICE_ROLE_KEY</code></td>
+              <td>Secret</td>
+              <td>Privileged backend database operations.</td>
+            </tr>
+            <tr>
+              <td><code>OPENAI_API_KEY</code>, <code>GOOGLE_TRANSLATE_API_KEY</code>, <code>GOOGLE_GEMINI_API_KEY</code></td>
+              <td>Secret</td>
+              <td>Voice, translation, and generation services.</td>
+            </tr>
+            <tr>
+              <td><code>WHATSAPP_ACCESS_TOKEN</code>, <code>WHATSAPP_PHONE_NUMBER_ID</code>, <code>WHATSAPP_VERIFY_TOKEN</code>, <code>WHATSAPP_APP_SECRET</code></td>
+              <td>Secret</td>
+              <td>WhatsApp Cloud API and webhook verification.</td>
+            </tr>
+          </tbody>
+        </table>
 
-```bash
-supabase start
-supabase db reset
-```
+        <p class="notice">Never commit <code>.env</code>, service-role keys, provider API keys, WhatsApp tokens, generated transcripts, dependency folders, or build output.</p>
+      </section>
 
-The migrations create the core schema, RLS policies, seed data, illustration storage, child profile enhancements, WhatsApp session updates, and curriculum records.
+      <section class="section" id="deploy">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Ship</span>
+            <h2>Verify the lane you changed.</h2>
+          </div>
+          <p class="section-intro">Run focused local checks, then let GitHub Actions repeat the full CI and Pages publishing path.</p>
+        </div>
 
-When changing data models:
+        <div class="grid three">
+          <article class="checklist">
+            <h3>Frontend</h3>
+            <ul>
+              <li><code>npm run lint</code></li>
+              <li><code>npm run build</code></li>
+              <li><code>npm run test</code></li>
+            </ul>
+          </article>
 
-- Add a new migration in `supabase/migrations/`; do not edit migrations that have already shipped.
-- Keep RLS policy changes close to the schema changes they protect.
-- Run `supabase db reset` before opening a pull request.
-- Update backend schemas, frontend types, and seed data together when a table contract changes.
+          <article class="checklist">
+            <h3>Backend</h3>
+            <ul>
+              <li><code>python -m compileall app</code></li>
+              <li><code>pytest</code></li>
+              <li>Keep route handlers thin.</li>
+            </ul>
+          </article>
 
-## API Development
+          <article class="checklist">
+            <h3>Deployment</h3>
+            <ul>
+              <li>Apply Supabase migrations first.</li>
+              <li>Set backend secrets server-side.</li>
+              <li>Configure <code>CORS_ORIGINS</code>.</li>
+            </ul>
+          </article>
+        </div>
 
-FastAPI routes live in `backend/app/api/`. Keep route handlers thin and move provider or business logic into `backend/app/services/`.
+        <div class="notice">
+          GitHub Pages is published by <code>.github/workflows/pages.yml</code>. The repository Pages source should remain set to GitHub Actions to avoid duplicate legacy Pages deployment checks.
+        </div>
+      </section>
+    </div>
 
-Common backend commands:
-
-```bash
-cd backend
-uvicorn app.main:app --reload
-python -m compileall app
-pytest
-```
-
-The backend reads settings from `backend/app/core/config.py` through Pydantic settings. Local values are loaded from `.env`.
-
-## Frontend Development
-
-The frontend uses Next.js App Router and TypeScript. Pages live in `frontend/src/app/`, shared components in `frontend/src/components/`, hooks in `frontend/src/hooks/`, and browser utilities in `frontend/src/lib/`.
-
-Common frontend commands:
-
-```bash
-cd frontend
-npm run dev
-npm run lint
-npm run build
-npm run test
-```
-
-Keep UI changes consistent with the existing child-friendly learning interface. Components that interact with API contracts should use the shared types in `frontend/src/lib/types.ts` and API helpers in `frontend/src/lib/api.ts`.
-
-## WhatsApp Flows
-
-WhatsApp support spans the FastAPI backend and the Supabase Edge Function:
-
-- `backend/app/api/whatsapp.py`
-- `backend/app/services/whatsapp_service.py`
-- `supabase/functions/whatsapp-webhook/index.ts`
-
-For local webhook testing, run the edge function with the local environment file:
-
-```bash
-supabase functions serve whatsapp-webhook --env-file .env
-```
-
-Use a tunnel such as ngrok when Meta needs to reach a local machine. Keep webhook verification tokens and app secrets out of source control.
-
-## Quality Checks
-
-Run the checks that match your change before opening a pull request:
-
-```bash
-cd frontend
-npm run lint
-npm run build
-npm run test
-```
-
-```bash
-cd backend
-python -m compileall app
-pytest
-```
-
-```bash
-supabase db reset
-```
-
-The GitHub workflows run frontend lint/build checks, backend compile checks, unit tests, and coverage upload.
-
-## Deployment Notes
-
-Deploy the frontend and backend as separate services. The frontend needs build-time public variables, while backend provider keys and Supabase service-role access must remain server-side.
-
-Recommended deployment checklist:
-
-- Configure frontend public variables before building the Next.js app.
-- Configure backend secrets in the backend hosting provider, not in the frontend project.
-- Apply Supabase migrations before routing production traffic to code that depends on new schema.
-- Configure `CORS_ORIGINS` with the production frontend origin.
-- Register WhatsApp webhook callback URLs after the public backend or edge function endpoint is available.
-- Verify voice, translation, illustration, and WhatsApp provider credentials in staging before production.
-
-## GitHub Pages
-
-This documentation is published by `.github/workflows/pages.yml`. The workflow builds the `docs/` directory with Jekyll and deploys the generated site with GitHub Pages on pushes to `main`.
-
-Repository admins should set the Pages publishing source to GitHub Actions in the repository settings before relying on this workflow for production docs publishing.
-
-To preview locally, install Jekyll if needed and serve the docs directory:
-
-```bash
-cd docs
-bundle install
-bundle exec jekyll serve
-```
-
-You can also read the Markdown directly without a local preview server.
+    <aside class="right-rail" aria-label="Page status and supporting links">
+      <div class="rail-card">
+        <h2>On this page</h2>
+        <a href="#setup">Quick start</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#api">Environment</a>
+        <a href="#deploy">Quality checks</a>
+      </div>
+      <div class="rail-card success">
+        <h2>Pages status</h2>
+        <p>Publishing source is set to GitHub Actions. Keep it there to avoid the legacy dynamic Pages check.</p>
+      </div>
+      <div class="rail-card warning">
+        <h2>Secrets</h2>
+        <p>Never expose service-role keys, AI provider keys, or WhatsApp tokens through frontend variables.</p>
+      </div>
+    </aside>
+  </div>
+</div>
