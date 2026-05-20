@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { getBackendAuthHeaders } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -48,7 +49,10 @@ export function useStepIllustration(
       try {
         const res = await fetch(`${API_URL}/api/content/step-illustration`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(await getBackendAuthHeaders()),
+          },
           body: JSON.stringify({
             lesson_id: lessonId,
             step_index: stepIndex,

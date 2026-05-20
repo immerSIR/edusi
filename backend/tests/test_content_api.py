@@ -105,7 +105,8 @@ async def test_generate_lesson_delegates_to_ai_service(monkeypatch):
     monkeypatch.setattr(content, "generate_lesson_content", fake_generate)
 
     result = await content.generate_lesson(
-        ContentGenerateRequest(subject="technology", topic="Internet Safety", max_age=10)
+        ContentGenerateRequest(subject="technology", topic="Internet Safety", max_age=10),
+        current_user_id="parent-1",
     )
 
     assert result == {"title": {"en": "Internet Safety"}}
@@ -137,7 +138,10 @@ async def test_generate_course_inserts_course_and_lessons(monkeypatch, use_db):
     monkeypatch.setattr(content, "generate_course_with_lessons", fake_generate)
     db = use_db(FakeSupabase({"courses": [[{"id": "course-1"}]], "lessons": [[{"id": "lesson-1"}]]}))
 
-    result = await content.generate_course(CourseGenerateRequest(subject="technology", child_age=8))
+    result = await content.generate_course(
+        CourseGenerateRequest(subject="technology", child_age=8),
+        current_user_id="parent-1",
+    )
 
     assert result == {"course_id": "course-1", "title": {"en": "Robotics"}, "lessons_count": 2}
     assert db.queries[0][0] == "courses"
@@ -159,13 +163,20 @@ async def test_generate_course_returns_error_when_course_insert_fails(monkeypatc
     monkeypatch.setattr(content, "generate_course_with_lessons", fake_generate)
     use_db(FakeSupabase({"courses": [[]]}))
 
-    assert await content.generate_course(CourseGenerateRequest()) == {"error": "Failed to create course"}
+    assert await content.generate_course(
+        CourseGenerateRequest(),
+        current_user_id="parent-1",
+    ) == {"error": "Failed to create course"}
 
 
 async def test_auto_generate_lessons_returns_existing_state(use_db):
     use_db(FakeSupabase({"lessons": [[{"id": "lesson-1"}]]}))
 
-    result = await content.auto_generate_lessons("course-1", BackgroundTasks())
+    result = await content.auto_generate_lessons(
+        "course-1",
+        BackgroundTasks(),
+        current_user_id="parent-1",
+    )
 
     assert result == {"status": "exists", "count": 1}
 
@@ -174,7 +185,11 @@ async def test_auto_generate_lessons_returns_generating_state(use_db):
     use_db(FakeSupabase({"lessons": [[]]}))
     content._generating_courses.add("course-1")
     try:
-        result = await content.auto_generate_lessons("course-1", BackgroundTasks())
+        result = await content.auto_generate_lessons(
+            "course-1",
+            BackgroundTasks(),
+            current_user_id="parent-1",
+        )
     finally:
         content._generating_courses.discard("course-1")
 
@@ -184,7 +199,11 @@ async def test_auto_generate_lessons_returns_generating_state(use_db):
 async def test_auto_generate_lessons_returns_error_for_missing_course(use_db):
     use_db(FakeSupabase({"lessons": [[]], "courses": [None]}))
 
-    result = await content.auto_generate_lessons("course-1", BackgroundTasks())
+    result = await content.auto_generate_lessons(
+        "course-1",
+        BackgroundTasks(),
+        current_user_id="parent-1",
+    )
 
     assert result == {"status": "error", "message": "Course not found"}
 
@@ -194,7 +213,11 @@ async def test_auto_generate_lessons_starts_background_task(use_db):
     course = {"id": "course-1", "title": {"en": "Robotics"}, "subject": "technology"}
     use_db(FakeSupabase({"lessons": [[]], "courses": [course]}))
 
-    result = await content.auto_generate_lessons("course-1", tasks)
+    result = await content.auto_generate_lessons(
+        "course-1",
+        tasks,
+        current_user_id="parent-1",
+    )
 
     assert result == {"status": "started"}
     assert "course-1" in content._generating_courses
@@ -243,7 +266,8 @@ async def test_generate_illustration_endpoint_delegates(monkeypatch):
     monkeypatch.setattr(content, "generate_illustration", fake_generate)
 
     result = await content.generate_illustration_endpoint(
-        IllustrationGenerateRequest(description="children at school", style="bright")
+        IllustrationGenerateRequest(description="children at school", style="bright"),
+        current_user_id="parent-1",
     )
 
     assert result == {"image_base64": "aW1hZ2U=", "mime_type": "image/png", "prompt_used": "bright"}
@@ -253,7 +277,8 @@ async def test_step_illustration_returns_cached_url(use_db):
     use_db(FakeSupabase(bucket=Bucket(files=[{"name": "lesson-1_2.png"}])))
 
     result = await content.step_illustration(
-        StepIllustrationRequest(lesson_id="lesson-1", step_index=2, description="robot")
+        StepIllustrationRequest(lesson_id="lesson-1", step_index=2, description="robot"),
+        current_user_id="parent-1",
     )
 
     assert result == {"url": "https://cdn.example/lesson-1_2.png", "cached": True}
@@ -267,7 +292,8 @@ async def test_step_illustration_falls_back_to_data_url_when_upload_fails(monkey
     use_db(FakeSupabase(bucket=Bucket(fail_upload=True)))
 
     result = await content.step_illustration(
-        StepIllustrationRequest(lesson_id="lesson-1", step_index=2, description="robot")
+        StepIllustrationRequest(lesson_id="lesson-1", step_index=2, description="robot"),
+        current_user_id="parent-1",
     )
 
     assert result == {"url": "data:image/png;base64,aW1hZ2U=", "cached": False}
@@ -282,7 +308,8 @@ async def test_course_thumbnail_generates_and_uploads_when_not_cached(monkeypatc
     use_db(FakeSupabase(bucket=bucket))
 
     result = await content.course_thumbnail(
-        CourseThumbnailRequest(course_id="course-1", description="robotics")
+        CourseThumbnailRequest(course_id="course-1", description="robotics"),
+        current_user_id="parent-1",
     )
 
     assert result == {"url": "https://cdn.example/course_course-1.png", "cached": False}

@@ -1,10 +1,64 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { apiFetch } from "./api";
+const supabaseMocks = vi.hoisted(() => ({
+  getSession: vi.fn(),
+}));
+
+vi.mock("./supabase", () => ({
+  supabase: {
+    auth: {
+      getSession: supabaseMocks.getSession,
+    },
+  },
+}));
+
+import { apiFetch, getBackendAuthHeaders } from "./api";
 
 describe("apiFetch", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    supabaseMocks.getSession.mockReset();
+  });
+
+  it("builds an authorization header from the Supabase session", async () => {
+    supabaseMocks.getSession.mockResolvedValue({
+      data: { session: { access_token: "session-token" } },
+      error: null,
+    });
+
+    await expect(getBackendAuthHeaders()).resolves.toEqual({
+      Authorization: "Bearer session-token",
+    });
+  });
+
+  it("adds the Supabase bearer token for authenticated backend requests", async () => {
+    supabaseMocks.getSession.mockResolvedValue({
+      data: { session: { access_token: "session-token" } },
+      error: null,
+    });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue({ status: "ok" }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      apiFetch<{ status: string }>("/api/content/generate-course", {
+        method: "POST",
+        authenticated: true,
+      }),
+    ).resolves.toEqual({ status: "ok" });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://localhost:8000/api/content/generate-course",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer session-token",
+        },
+      },
+    );
   });
 
   it("prefixes paths with the backend URL and merges JSON headers", async () => {

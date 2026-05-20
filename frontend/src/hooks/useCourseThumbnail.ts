@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { getBackendAuthHeaders } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -47,7 +48,10 @@ export function useCourseThumbnail(
       try {
         const res = await fetch(`${API_URL}/api/content/course-thumbnail`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(await getBackendAuthHeaders()),
+          },
           body: JSON.stringify({ course_id: courseId, description }),
         });
 

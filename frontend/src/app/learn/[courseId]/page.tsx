@@ -13,6 +13,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import type { Course, Lesson, LessonProgress } from "@/lib/types";
+import { getBackendAuthHeaders } from "@/lib/api";
 import { useChild } from "@/contexts/ChildContext";
 import { useSound } from "@/contexts/SoundContext";
 
@@ -77,7 +78,10 @@ export default function CourseDetailPage() {
     try {
       const res = await fetch(
         `${BACKEND_URL}/api/content/courses/${courseId}/auto-generate`,
-        { method: "POST" }
+        {
+          method: "POST",
+          headers: await getBackendAuthHeaders(),
+        }
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();

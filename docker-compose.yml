@@ -31,7 +31,9 @@ services:
       WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN:-}
       WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID:-}
       WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET:-}
       BACKEND_URL: ${BACKEND_URL:-http://localhost:8000}
+      BACKEND_INTERNAL_SECRET: ${BACKEND_INTERNAL_SECRET:-local-backend-internal-secret}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     volumes:
       - ./backend:/app

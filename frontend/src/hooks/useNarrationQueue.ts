@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { getBackendAuthHeaders } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -82,7 +83,10 @@ export function useNarrationQueue(): UseNarrationQueueReturn {
       try {
         const res = await fetch(`${API_URL}/api/voice/synthesize`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(await getBackendAuthHeaders()),
+          },
           body: JSON.stringify({ text, language }),
           signal,
         });

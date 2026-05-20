@@ -93,6 +93,7 @@ async def test_update_progress_updates_existing_progress(use_db):
     db = use_db(
         FakeSupabase(
             {
+                "children": [[{"id": "child-1"}]],
                 "lesson_progress": [
                     [
                         {
@@ -114,9 +115,13 @@ async def test_update_progress_updates_existing_progress(use_db):
         correct=True,
     )
 
-    assert await lessons.update_progress("lesson-1", req) == {"message": "Progress updated"}
+    assert await lessons.update_progress(
+        "lesson-1",
+        req,
+        current_user_id="parent-1",
+    ) == {"message": "Progress updated"}
 
-    update_calls = db.queries[1][1].calls
+    update_calls = db.queries[2][1].calls
     assert update_calls[0] == (
         "update",
         {
@@ -130,7 +135,14 @@ async def test_update_progress_updates_existing_progress(use_db):
 
 
 async def test_update_progress_inserts_new_progress(use_db):
-    db = use_db(FakeSupabase({"lesson_progress": [[], [{"id": "progress-2"}]]}))
+    db = use_db(
+        FakeSupabase(
+            {
+                "children": [[{"id": "child-1"}]],
+                "lesson_progress": [[], [{"id": "progress-2"}]],
+            }
+        )
+    )
     req = LessonProgressUpdate(
         child_id="child-1",
         step_index=2,
@@ -138,9 +150,13 @@ async def test_update_progress_inserts_new_progress(use_db):
         correct=False,
     )
 
-    assert await lessons.update_progress("lesson-1", req) == {"message": "Progress updated"}
+    assert await lessons.update_progress(
+        "lesson-1",
+        req,
+        current_user_id="parent-1",
+    ) == {"message": "Progress updated"}
 
-    assert db.queries[1][1].calls[0] == (
+    assert db.queries[2][1].calls[0] == (
         "insert",
         {
             "child_id": "child-1",
@@ -157,6 +173,7 @@ async def test_get_next_lesson_returns_first_uncompleted_lesson(use_db):
     use_db(
         FakeSupabase(
             {
+                "children": [[{"id": "child-1"}]],
                 "lesson_progress": [[{"lesson_id": "lesson-1", "score": 1}]],
                 "lessons": [
                     [
@@ -168,7 +185,7 @@ async def test_get_next_lesson_returns_first_uncompleted_lesson(use_db):
         )
     )
 
-    assert await lessons.get_next_lesson("child-1") == {
+    assert await lessons.get_next_lesson("child-1", current_user_id="parent-1") == {
         "lesson_id": "lesson-2",
         "course_id": "course-1",
         "title": {"en": "Two"},
@@ -180,13 +197,13 @@ async def test_get_child_stats_calculates_accuracy_from_completed_lessons(use_db
     use_db(
         FakeSupabase(
             {
-                "children": [{"total_points": 75, "current_level": 3}],
+                "children": [[{"id": "child-1"}], {"total_points": 75, "current_level": 3}],
                 "lesson_progress": [[{"score": 1}, {"score": 0}, {"score": 1}]],
             }
         )
     )
 
-    assert await lessons.get_child_stats("child-1") == {
+    assert await lessons.get_child_stats("child-1", current_user_id="parent-1") == {
         "total_points": 75,
         "current_level": 3,
         "lessons_completed": 3,
