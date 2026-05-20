@@ -1,0 +1,13 @@
+[run]
+branch = True
+source = app
+omit =
+    app/services/ai_service.py
+    app/services/illustration_service.py
+    app/services/voice_service.py
+    app/services/whatsapp_service.py
+
+[report]
+show_missing = True
+skip_covered = True
+fail_under = 80
