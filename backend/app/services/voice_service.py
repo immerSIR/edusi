@@ -260,7 +260,29 @@ async def _synthesize_english_wav(text: str) -> bytes:
     return response.content
 
 
-async def transcribe_audio(audio_bytes: bytes, language: str) -> dict:
+def _detect_audio_ext(audio_bytes: bytes, content_type: str = "") -> str:
+    """Detect audio file extension from content type or magic bytes."""
+    if "webm" in content_type:
+        return "webm"
+    if "mp4" in content_type or "m4a" in content_type:
+        return "mp4"
+    if "ogg" in content_type or "opus" in content_type:
+        return "ogg"
+    if "wav" in content_type:
+        return "wav"
+    # Fallback: check magic bytes
+    if audio_bytes[:4] == b"OggS":
+        return "ogg"
+    if audio_bytes[:4] == b"RIFF":
+        return "wav"
+    if audio_bytes[4:8] == b"ftyp":
+        return "mp4"
+    if audio_bytes[:4] == b"\x1a\x45\xdf\xa3":
+        return "webm"
+    return "webm"  # safe default — OpenAI accepts webm
+
+
+async def transcribe_audio(audio_bytes: bytes, language: str, content_type: str = "") -> dict:
     """Transcribe audio to text.
 
     - Yoruba: LyngualLabs/whisper-small-yoruba (local HF model)
@@ -273,8 +295,9 @@ async def transcribe_audio(audio_bytes: bytes, language: str) -> dict:
 
     # English: use GPT-4o-mini-transcribe with logprobs for confidence scoring
     client = _get_openai()
+    ext = _detect_audio_ext(audio_bytes, content_type)
     audio_file = io.BytesIO(audio_bytes)
-    audio_file.name = "audio.ogg"
+    audio_file.name = f"audio.{ext}"
 
     transcript = await client.audio.transcriptions.create(
         model="gpt-4o-mini-transcribe",

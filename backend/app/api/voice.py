@@ -14,7 +14,7 @@ async def transcribe(
 ):
     """Transcribe audio to text. Supports 'en' (English) and 'yo' (Yoruba)."""
     audio_bytes = await audio.read()
-    result = await transcribe_audio(audio_bytes, language)
+    result = await transcribe_audio(audio_bytes, language, content_type=audio.content_type or "")
     return result
 
 

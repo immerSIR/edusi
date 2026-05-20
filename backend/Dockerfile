@@ -2,11 +2,18 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# System dependencies: ffmpeg for audio conversion (WAV→OGG)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY . .
+# Install Python deps (torch CPU-only to keep image small)
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir \
+    torch --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8000
+COPY backend/ .
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Railway sets $PORT dynamically
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
