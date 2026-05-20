@@ -374,6 +374,7 @@ a {
 
 .card,
 .lane,
+.team-card,
 .checklist,
 .env-table,
 .repo-map {
@@ -387,18 +388,33 @@ a {
 }
 
 .card h3,
-.lane h3 {
+.lane h3,
+.team-card h3 {
   font-size: 20px;
   letter-spacing: 0;
   margin: 0 0 10px;
 }
 
 .card p,
-.lane p {
+.lane p,
+.team-card p {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.55;
   margin: 0;
+}
+
+.team-card a {
+  color: var(--ink);
+  text-decoration-color: var(--line-strong);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.team-card a:hover,
+.team-card a:focus {
+  color: var(--emerald-strong);
+  outline: none;
 }
 
 .code-card {
@@ -436,6 +452,25 @@ a {
 .architecture {
   display: grid;
   gap: 14px;
+}
+
+.team-list {
+  display: grid;
+  gap: 14px;
+}
+
+.team-card {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 64px minmax(180px, 0.28fr) minmax(0, 1fr);
+  padding: 20px;
+}
+
+.team-card span {
+  color: var(--coral);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .lane {
@@ -597,7 +632,8 @@ pre code {
   .section-header,
   .grid.two,
   .grid.three,
-  .lane {
+  .lane,
+  .team-card {
     grid-template-columns: 1fr;
   }
 

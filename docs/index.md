@@ -10,6 +10,7 @@ description: Developer documentation for the Edusi learning platform.
       <nav class="side-nav">
         <p>Get started</p>
         <a href="#overview">Overview</a>
+        <a href="#mission">Mission</a>
         <a href="#setup">Quick start</a>
         <a href="#architecture">Architecture</a>
         <p>Build</p>
@@ -17,20 +18,49 @@ description: Developer documentation for the Edusi learning platform.
         <a href="#supabase">Supabase</a>
         <a href="#api">Environment</a>
         <a href="#deploy">Deploy</a>
+        <p>Project</p>
+        <a href="#team">Team</a>
       </nav>
       <div class="side-note">
-        <strong>Developer rule</strong>
-        <span>Keep public browser configuration separate from backend secrets and provider credentials.</span>
+        <strong>Open education</strong>
+        <span>Edusi begins with Yoruba and English for Nigerian children, with an architecture that can be localized for more languages and regions.</span>
       </div>
     </aside>
 
     <div class="docs-content">
       <section class="intro" id="overview">
         <h1>Edusi Developer Docs</h1>
-        <p>Build, run, and ship Edusi across Next.js, FastAPI, Supabase, AI services, and WhatsApp learning flows.</p>
+        <p>Build, run, and ship an open-source bilingual learning platform that teaches English and technology through Yoruba, adaptive AI support, and child-friendly play.</p>
         <div class="intro-actions">
           <a class="button primary" href="#setup">Start setup</a>
           <a class="button secondary" href="https://github.com/immerSIR/edusi">GitHub repository</a>
+        </div>
+      </section>
+
+      <section class="section compact" id="mission">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Mission</span>
+            <h2>Open education in the language children think in.</h2>
+          </div>
+          <p class="section-intro">Edusi combines "education" with "si", the Yoruba word for "open". The product starts with Nigerian children learning English and technology through Yoruba, then keeps the platform flexible enough for other languages and communities.</p>
+        </div>
+
+        <div class="grid three">
+          <article class="card">
+            <h3>Who it serves</h3>
+            <p>Children in underserved or remote Nigerian communities, plus parents in urban areas who want affordable, engaging tutoring support.</p>
+          </article>
+
+          <article class="card">
+            <h3>What it teaches</h3>
+            <p>English and technology literacy through bilingual lessons, voice interaction, visual support, progress tracking, and game-like feedback.</p>
+          </article>
+
+          <article class="card">
+            <h3>How it reaches learners</h3>
+            <p>A responsive web app for phones, tablets, and desktops, with WhatsApp learning flows for families with limited bandwidth or intermittent connectivity.</p>
+          </article>
         </div>
       </section>
 
@@ -312,19 +342,51 @@ supabase db reset</code></pre>
           GitHub Pages is published by <code>.github/workflows/pages.yml</code>. The repository Pages source should remain set to GitHub Actions to avoid duplicate legacy Pages deployment checks.
         </div>
       </section>
+
+      <section class="section" id="team">
+        <div class="section-header">
+          <div>
+            <span class="section-label">Team</span>
+            <h2>People behind the project.</h2>
+          </div>
+          <p class="section-intro">Edusi was created by a small team listed here in the original project order.</p>
+        </div>
+
+        <div class="team-list">
+          <article class="team-card">
+            <span>01</span>
+            <h3><a href="https://www.linkedin.com/in/mohdoumbia223/">Mohamed Doumbia</a></h3>
+            <p>Technical lead and repository maintainer; built the frontend, backend, Supabase, AI, and WhatsApp integration layers.</p>
+          </article>
+
+          <article class="team-card">
+            <span>02</span>
+            <h3><a href="https://www.linkedin.com/in/kingsolomonehinola/">Kingsolomon Ehinola</a></h3>
+            <p>Project collaborator; contributed to product direction, learner needs, and project shaping.</p>
+          </article>
+
+          <article class="team-card">
+            <span>03</span>
+            <h3><a href="https://www.linkedin.com/in/ndeborah/">Deborah Nabuduwa</a></h3>
+            <p>Project collaborator; contributed to product direction, learner needs, and project shaping.</p>
+          </article>
+        </div>
+      </section>
     </div>
 
     <aside class="right-rail" aria-label="Page status and supporting links">
       <div class="rail-card">
         <h2>On this page</h2>
+        <a href="#mission">Mission</a>
         <a href="#setup">Quick start</a>
         <a href="#architecture">Architecture</a>
         <a href="#api">Environment</a>
         <a href="#deploy">Quality checks</a>
+        <a href="#team">Team</a>
       </div>
       <div class="rail-card success">
-        <h2>Pages status</h2>
-        <p>Publishing source is set to GitHub Actions. Keep it there to avoid the legacy dynamic Pages check.</p>
+        <h2>Localization</h2>
+        <p>The current content model centers Yoruba and English, but translations, curriculum records, and voice flows can be adapted for other language pairs.</p>
       </div>
       <div class="rail-card warning">
         <h2>Secrets</h2>

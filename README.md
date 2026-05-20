@@ -9,7 +9,36 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Auth%20%7C%20Storage-3FCF8E?logo=supabase&logoColor=white)](supabase)
 [![Developer Docs](https://img.shields.io/badge/Developer%20Docs-GitHub%20Pages-08875D)](https://immersir.github.io/edusi/)
 
-Edusi is a gamified bilingual learning platform for Nigerian children. It teaches English and technology through Yoruba/English lessons, voice interactions, illustrations, progress tracking, and WhatsApp learning flows.
+Edusi is an open-source, gamified bilingual learning platform for Nigerian children. It teaches English and technology through Yoruba/English lessons, voice interactions, illustrations, progress tracking, and WhatsApp learning flows.
+
+The name combines "education" with "si", the Yoruba word for "open". The project starts with a clear beachhead: children in Nigeria who can learn more confidently when early English and technology concepts are introduced in a language they already understand.
+
+## Project Scope
+
+Edusi is designed for two primary audiences:
+
+- Children in underserved or remote Nigerian communities who need accessible learning support in their mother tongue.
+- Parents and guardians in cities such as Lagos, Abuja, Ibadan, and other urban areas who want affordable, engaging tutoring support for their children.
+
+The current implementation focuses on Yoruba and English, but the architecture is intended to support other language pairs and regions over time. Future contributors can adapt the curriculum, translations, voice flows, and cultural examples for additional Nigerian languages or for learners in other countries.
+
+Core product capabilities include:
+
+- Adaptive bilingual lessons for English and technology literacy
+- Child-friendly gamified progress tracking
+- AI-supported voice, translation, narration, and illustration workflows
+- Responsive web access for phones, tablets, and desktops
+- WhatsApp learning flows for families with limited bandwidth or intermittent connectivity
+
+## Team
+
+Edusi was created by a small team listed here in the original project order:
+
+| Name | Contribution |
+| --- | --- |
+| [Mohamed Doumbia](https://www.linkedin.com/in/mohdoumbia223/) | Technical lead and repository maintainer; built the frontend, backend, Supabase, AI, and WhatsApp integration layers. |
+| [Kingsolomon Ehinola](https://www.linkedin.com/in/kingsolomonehinola/) | Project collaborator; contributed to product direction, learner needs, and project shaping. |
+| [Deborah Nabuduwa](https://www.linkedin.com/in/ndeborah/) | Project collaborator; contributed to product direction, learner needs, and project shaping. |
 
 ## Developer Docs
 
