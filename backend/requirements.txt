@@ -9,6 +9,6 @@ google-genai>=1.0.0
 openai>=1.55.0
 transformers>=4.46.0
 # torch installed separately in Dockerfile (CPU-only)
-scipy>=1.14.0
+scipy>=1.17.1
 soundfile>=0.12.0
 accelerate>=1.1.0
