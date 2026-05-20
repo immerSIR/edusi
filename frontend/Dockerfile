@@ -6,12 +6,15 @@ RUN npm ci
 
 COPY frontend/ .
 
-# Hardcode production URLs for Next.js build-time inlining.
 # NEXT_PUBLIC_* vars must be present during `next build`.
-ENV NEXT_PUBLIC_SUPABASE_URL=https://aaxjhvapcslcruhriggk.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=sb_publishable_LaAUWZEOhLUR6Z35UJfdJA_iSz_dp-l
-ENV NEXT_PUBLIC_API_URL=https://backend-production-b134.up.railway.app
-ENV NEXT_PUBLIC_BACKEND_URL=https://backend-production-b134.up.railway.app
+ARG NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+ARG NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=local-anon-key
+ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ARG NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
 RUN npm run build
 
