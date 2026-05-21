@@ -49,6 +49,17 @@ If your change affects Supabase schema or seed data, also run:
 supabase db reset
 ```
 
+## Review and Merge Policy
+
+Edusi uses a solo-maintainer pull request workflow for `main`.
+
+- Pull requests are required before merging to `main`.
+- CI must pass before merge, including frontend checks, backend checks, frontend unit tests, and backend unit tests.
+- Branches must be up to date with `main` before merging.
+- Review conversations must be resolved before merge.
+- CodeRabbit and Claude comments are advisory unless their GitHub checks are later made reliable and required.
+- Required human approval is disabled because a solo maintainer cannot approve their own pull request on GitHub.
+
 ## Pull Requests
 
 Please include:
