@@ -93,13 +93,13 @@ Start with the [published developer documentation](https://immersir.github.io/ed
    cd ..
    ```
 
-5. Install backend dependencies:
+5. Install backend runtime and test dependencies:
 
    ```bash
    cd backend
    python -m venv .venv
    source .venv/bin/activate
-   pip install -r requirements.txt
+   pip install -r requirements.txt -r requirements-dev.txt
    cd ..
    ```
 
@@ -168,6 +168,7 @@ Backend:
 ```bash
 cd backend
 uvicorn app.main:app --reload
+pytest
 python -m compileall app
 ```
 
