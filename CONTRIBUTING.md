@@ -7,13 +7,13 @@ Thanks for helping improve Edusi. This guide explains how to get a local develop
 1. Fork and clone the repository.
 2. Copy `.env.example` to `.env` and fill in local values.
 3. Install frontend dependencies with `cd frontend && npm install`.
-4. Install backend dependencies with:
+4. Install backend runtime and test dependencies with:
 
    ```bash
    cd backend
    python -m venv .venv
    source .venv/bin/activate
-   pip install -r requirements.txt
+   pip install -r requirements.txt -r requirements-dev.txt
    ```
 
 5. Start the backend with `cd backend && uvicorn app.main:app --reload`.
@@ -40,6 +40,7 @@ npm run build
 
 ```bash
 cd backend
+pytest
 python -m compileall app
 ```
 
