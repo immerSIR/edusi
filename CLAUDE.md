@@ -40,3 +40,14 @@ Edusi is a gamified bilingual (Yoruba/English) learning platform for Nigerian ch
 - Frontend dev: `cd frontend && npm run dev`
 - Backend dev: `cd backend && uvicorn app.main:app --reload`
 - Lint frontend: `cd frontend && npm run lint`
+
+## Review Standards
+Reviews should prioritize correctness, security, accessibility, and regression risk.
+
+- Keep changes scoped to the issue or PR description.
+- Add or update tests for changed behavior.
+- Do not request cosmetic-only changes unless they affect maintainability, accessibility, or user behavior.
+- Treat Supabase RLS, authentication, authorization, dependency manifests, deployment files, and GitHub Actions as security-sensitive.
+- GitHub Actions should use least-privilege permissions.
+- Do not run untrusted pull request code under privileged `pull_request_target` workflows.
+- In solo-maintainer mode, Claude review comments are advisory; deterministic CI and maintainer judgment decide merge readiness.
