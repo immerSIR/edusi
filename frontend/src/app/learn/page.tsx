@@ -10,6 +10,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  AlertCircle,
 } from "lucide-react";
 import type { Course } from "@/lib/types";
 import { getBackendAuthHeaders } from "@/lib/api";
@@ -38,6 +39,7 @@ export default function LearnPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const [progressMap, setProgressMap] = useState<
     Record<string, CourseProgress>
   >({});
@@ -148,6 +150,7 @@ export default function LearnPage() {
   async function handleGenerateCourse() {
     if (!child || generating) return;
     setGenerating(true);
+    setGenerationError(null);
     playSound("tap");
 
     try {
@@ -170,8 +173,12 @@ export default function LearnPage() {
       if (!res.ok) throw new Error("Course generation failed");
       playSound("complete");
       await loadData();
+      setGenerationError(null);
     } catch (err) {
       console.error("Failed to generate course:", err);
+      setGenerationError(
+        "We couldn't generate a new course right now. Please try again."
+      );
       playSound("incorrect");
     } finally {
       setGenerating(false);
@@ -390,6 +397,24 @@ export default function LearnPage() {
               )}
               {generating ? "Generating..." : "Generate New Course"}
             </button>
+            {generationError && (
+              <div
+                role="alert"
+                className="mt-3 inline-flex max-w-sm items-start gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-left text-sm text-red-700"
+              >
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div className="flex-1">
+                  <p>{generationError}</p>
+                  <button
+                    type="button"
+                    onClick={() => setGenerationError(null)}
+                    className="mt-1 font-semibold text-red-800 underline-offset-2 hover:underline"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
