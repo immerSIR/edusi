@@ -24,6 +24,21 @@ const BACKEND_URL =
 
 const COURSES_PER_PAGE = 6;
 
+type BilingualText = {
+  en: string;
+  yo: string;
+};
+
+const GENERATION_ERROR_MESSAGE: BilingualText = {
+  en: "We couldn't generate a new course right now. Please try again.",
+  yo: "A ko le ṣẹda ẹkọ tuntun ni bayi. Jọwọ gbiyanju lẹẹkansi.",
+};
+
+const DISMISS_LABEL: BilingualText = {
+  en: "Dismiss",
+  yo: "Pa a mọ́",
+};
+
 interface CourseProgress {
   totalLessons: number;
   completedLessons: number;
@@ -39,7 +54,9 @@ export default function LearnPage() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [generationError, setGenerationError] = useState<BilingualText | null>(
+    null
+  );
   const [progressMap, setProgressMap] = useState<
     Record<string, CourseProgress>
   >({});
@@ -173,12 +190,9 @@ export default function LearnPage() {
       if (!res.ok) throw new Error("Course generation failed");
       playSound("complete");
       await loadData();
-      setGenerationError(null);
     } catch (err) {
       console.error("Failed to generate course:", err);
-      setGenerationError(
-        "We couldn't generate a new course right now. Please try again."
-      );
+      setGenerationError(GENERATION_ERROR_MESSAGE);
       playSound("incorrect");
     } finally {
       setGenerating(false);
@@ -404,13 +418,13 @@ export default function LearnPage() {
               >
                 <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <div className="flex-1">
-                  <p>{generationError}</p>
+                  <p>{generationError.en}</p>
                   <button
                     type="button"
                     onClick={() => setGenerationError(null)}
                     className="mt-1 font-semibold text-red-800 underline-offset-2 hover:underline"
                   >
-                    Dismiss
+                    {DISMISS_LABEL.en}
                   </button>
                 </div>
               </div>
