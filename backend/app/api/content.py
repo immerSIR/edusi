@@ -1,7 +1,7 @@
 import base64
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 
 from app.models.schemas import (
     ContentGenerateRequest,
@@ -70,7 +70,9 @@ async def generate_course(
 
     course_res = sb.table("courses").insert(course_data).execute()
     if not course_res.data:
-        return {"error": "Failed to create course"}
+        # Surface a real HTTP error so the client's `res.ok` guard trips and
+        # the user sees the generation failure instead of a silent 200.
+        raise HTTPException(status_code=500, detail="Failed to create course")
 
     course_id = course_res.data[0]["id"]
 

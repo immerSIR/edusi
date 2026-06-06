@@ -1,5 +1,6 @@
 import pytest
 from fastapi import BackgroundTasks
+from fastapi import HTTPException
 
 from app.api import content
 from app.models.schemas import (
@@ -149,7 +150,7 @@ async def test_generate_course_inserts_course_and_lessons(monkeypatch, use_db):
     assert len(db.queries[1][1].calls[0][1]) == 2
 
 
-async def test_generate_course_returns_error_when_course_insert_fails(monkeypatch, use_db):
+async def test_generate_course_raises_when_course_insert_fails(monkeypatch, use_db):
     async def fake_generate(**kwargs):
         return {
             "course_title": {"en": "Robotics"},
@@ -163,10 +164,14 @@ async def test_generate_course_returns_error_when_course_insert_fails(monkeypatc
     monkeypatch.setattr(content, "generate_course_with_lessons", fake_generate)
     use_db(FakeSupabase({"courses": [[]]}))
 
-    assert await content.generate_course(
-        CourseGenerateRequest(),
-        current_user_id="parent-1",
-    ) == {"error": "Failed to create course"}
+    with pytest.raises(HTTPException) as exc:
+        await content.generate_course(
+            CourseGenerateRequest(),
+            current_user_id="parent-1",
+        )
+
+    assert exc.value.status_code == 500
+    assert exc.value.detail == "Failed to create course"
 
 
 async def test_auto_generate_lessons_returns_existing_state(use_db):
