@@ -61,6 +61,10 @@ export default function LearnPage() {
     Record<string, CourseProgress>
   >({});
 
+  // Show user-facing text in the child's preferred language (fallback: Yoruba)
+  const preferredLang: "en" | "yo" =
+    (child?.preferred_language || "yo") === "en" ? "en" : "yo";
+
   const loadData = useCallback(async () => {
     const { data } = await supabase
       .from("courses")
@@ -418,13 +422,13 @@ export default function LearnPage() {
               >
                 <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <div className="flex-1">
-                  <p>{generationError.en}</p>
+                  <p>{generationError[preferredLang]}</p>
                   <button
                     type="button"
                     onClick={() => setGenerationError(null)}
                     className="mt-1 font-semibold text-red-800 underline-offset-2 hover:underline"
                   >
-                    {DISMISS_LABEL.en}
+                    {DISMISS_LABEL[preferredLang]}
                   </button>
                 </div>
               </div>
